@@ -1,17 +1,14 @@
 package su.nightexpress.excellentjobs.grind.adapter.impl;
 
-import com.oheers.fish.EvenMoreFish;
-import com.oheers.fish.api.EMFAPI;
-import com.oheers.fish.fishing.items.Fish;
-import io.lumine.mythic.api.mobs.MythicMob;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import su.nightexpress.excellentjobs.grind.adapter.AbstractGrindAdapter;
 
-public class EvenMoreFishAdapter extends AbstractGrindAdapter<Fish, ItemStack> {
+import java.lang.reflect.Method;
 
-    private static final EMFAPI API = EvenMoreFish.getInstance().getApi();
+public class EvenMoreFishAdapter extends AbstractGrindAdapter<Object, ItemStack> {
+
     private static final String DELIMITER = ":";
 
     public EvenMoreFishAdapter(@NotNull String name) {
@@ -20,33 +17,74 @@ public class EvenMoreFishAdapter extends AbstractGrindAdapter<Fish, ItemStack> {
 
     @Override
     public boolean canHandle(@NotNull ItemStack itemStack) {
-        return API.isFish(itemStack);
+        Object api = getApi();
+        if (api == null) return false;
+
+        Object result = invoke(api, "isFish", new Class<?>[]{ItemStack.class}, itemStack);
+        return result instanceof Boolean bool && bool;
     }
 
     @Override
     @Nullable
-    public Fish getTypeByName(@NotNull String name) {
+    public Object getTypeByName(@NotNull String name) {
         String[] split = name.split(DELIMITER);
         if (split.length < 2) return null;
 
-        return API.getFish(split[0], split[1]);
+        Object api = getApi();
+        if (api == null) return null;
+
+        return invoke(api, "getFish", new Class<?>[]{String.class, String.class}, split[0], split[1]);
     }
 
     @Override
     @Nullable
-    public Fish getType(@NotNull ItemStack itemStack) {
-        return API.getFish(itemStack);
+    public Object getType(@NotNull ItemStack itemStack) {
+        Object api = getApi();
+        if (api == null) return null;
+
+        return invoke(api, "getFish", new Class<?>[]{ItemStack.class}, itemStack);
     }
 
     @Override
     @NotNull
-    public String getName(@NotNull Fish fish) {
-        return fish.getRarity().getId() + DELIMITER + fish.getName();
+    public String getName(@NotNull Object fish) {
+        Object rarity = invoke(fish, "getRarity", new Class<?>[]{});
+        Object rarityId = rarity == null ? null : invoke(rarity, "getId", new Class<?>[]{});
+        Object fishName = invoke(fish, "getName", new Class<?>[]{});
+
+        if (rarityId == null || fishName == null) {
+            return fish.toString();
+        }
+
+        return rarityId + DELIMITER + fishName;
     }
 
     @Override
     @NotNull
-    public String toFullNameOfType(@NotNull Fish fish) {
+    public String toFullNameOfType(@NotNull Object fish) {
         return "evenmorefish:" + super.toFullNameOfType(fish);
+    }
+
+    @Nullable
+    private static Object getApi() {
+        try {
+            Class<?> pluginClass = Class.forName("com.oheers.fish.EvenMoreFish");
+            Object plugin = pluginClass.getMethod("getInstance").invoke(null);
+            return pluginClass.getMethod("getApi").invoke(plugin);
+        }
+        catch (ReflectiveOperationException ignored) {
+            return null;
+        }
+    }
+
+    @Nullable
+    private static Object invoke(@NotNull Object target, @NotNull String method, @NotNull Class<?>[] parameterTypes, Object... args) {
+        try {
+            Method targetMethod = target.getClass().getMethod(method, parameterTypes);
+            return targetMethod.invoke(target, args);
+        }
+        catch (ReflectiveOperationException ignored) {
+            return null;
+        }
     }
 }
