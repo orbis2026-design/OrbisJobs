@@ -4,8 +4,8 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>su.nightexpress.excellentjobs</groupId>
-    <artifactId>ExcellentJobs</artifactId>
+    <groupId>su.nightexpress.orbisjobs</groupId>
+    <artifactId>orbisjobs</artifactId>
     <version>1.15.2</version>
 
     <properties>
@@ -22,11 +22,6 @@
     </distributionManagement>
 
     <repositories>
-<!--        <repository>-->
-<!--            <id>spigot-repo</id>-->
-<!--            <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>-->
-<!--        </repository>-->
-
         <repository>
             <id>papermc</id>
             <url>https://repo.papermc.io/repository/maven-public/</url>
@@ -53,8 +48,8 @@
         </repository>
 
         <repository>
-            <id>maven</id>
-            <url>https://repo1.maven.org/maven2/</url>
+            <id>maven-central-direct</id>
+            <url>https://repo1.maven.org/maven2</url>
         </repository>
 
         <repository>
@@ -68,25 +63,19 @@
         </repository>
 
         <repository>
-            <id>lumine-snapshot</id>
-            <url>https://mvn.lumine.io/repository/maven-snapshots/</url>
-        </repository>
-
-        <repository>
-            <id>xiaomomi's plugins-releases</id>
+            <id>xiaomomi-plugins-releases</id>
             <url>https://repo.momirealms.net/releases</url>
         </repository>
-
     </repositories>
 
-    <dependencies>
-<!--        <dependency>-->
-<!--            <groupId>org.spigotmc</groupId>-->
-<!--            <artifactId>spigot-api</artifactId>-->
-<!--            <version>1.21.4-R0.1-SNAPSHOT</version>-->
-<!--            <scope>provided</scope>-->
-<!--        </dependency>-->
+    <pluginRepositories>
+        <pluginRepository>
+            <id>maven-central-direct</id>
+            <url>https://repo1.maven.org/maven2</url>
+        </pluginRepository>
+    </pluginRepositories>
 
+    <dependencies>
         <dependency>
             <groupId>io.papermc.paper</groupId>
             <artifactId>paper-api</artifactId>
@@ -129,20 +118,6 @@
         </dependency>
 
         <dependency>
-            <groupId>io.github.arcaneplugins.levelledmobs</groupId>
-            <artifactId>LevelledMobs</artifactId>
-            <version>4.0.5</version>
-            <scope>provided</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>com.oheers.fish</groupId>
-            <artifactId>EvenMoreFish</artifactId>
-            <version>2.0.0-SNAPSHOT</version>
-            <scope>provided</scope>
-        </dependency>
-
-        <dependency>
             <groupId>net.momirealms</groupId>
             <artifactId>custom-fishing</artifactId>
             <version>2.3.7</version>
@@ -160,9 +135,8 @@
     <build>
         <resources>
             <resource>
-                <directory>src/main/resources</directory> <!-- (your resources folder location) -->
-                <filtering>true
-                </filtering> <!-- this is the important part, it's what replaces, filters, all placeholders in the resources folder (such as ${project.version} in plugin.yml) -->
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
             </resource>
         </resources>
     </build>
